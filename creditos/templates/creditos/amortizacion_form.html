@@ -12,6 +12,7 @@
                 </h5>
             </div>
             <div class="card-body">
+                <!-- Información de la cuota -->
                 <div class="alert alert-info">
                     <h6><i class="bi bi-info-circle"></i> Información de la Cuota</h6>
                     <table class="table table-sm table-borderless mb-0">
@@ -46,6 +47,15 @@
                     </table>
                 </div>
 
+                {% if cuota_anterior_pendiente %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Advertencia:</strong> La cuota N° {{ cuota_anterior_pendiente.numero_cuota }} 
+                    aún no está pagada. Debe pagarla primero antes de marcar esta cuota como pagada.
+                </div>
+                {% endif %}
+
+                <!-- Formulario -->
                 <form method="POST">
                     {% csrf_token %}
                     
@@ -104,11 +114,13 @@
         <!-- Información adicional -->
         <div class="card mt-3">
             <div class="card-body">
-                <h6 class="text-info"><i class="bi bi-lightbulb"></i> Información</h6>
+                <h6 class="text-info"><i class="bi bi-lightbulb"></i> Información Importante</h6>
                 <ul class="small mb-0">
+                    <li><strong>Orden de pagos:</strong> Las cuotas deben pagarse en orden secuencial. No puede pagar una cuota si la anterior no está pagada.</li>
                     <li>Si marca la cuota como pagada, debe ingresar la fecha real de pago</li>
                     <li>El sistema calculará automáticamente los días de mora si corresponde</li>
-                    <li>Si desmarca una cuota pagada, la fecha de pago se eliminará</li>
+                    <li>No puede desmarcar una cuota pagada si hay cuotas posteriores ya pagadas</li>
+                    <li>La fecha de pago no puede ser anterior a la fecha de pago de la cuota anterior</li>
                 </ul>
             </div>
         </div>
@@ -116,6 +128,7 @@
 </div>
 
 <script>
+    // Habilitar/deshabilitar campo de fecha según checkbox
     document.addEventListener('DOMContentLoaded', function() {
         const pagadoCheckbox = document.getElementById('{{ form.pagado.id_for_label }}');
         const fechaInput = document.getElementById('{{ form.fecha_pago_real.id_for_label }}');
@@ -131,7 +144,7 @@
         }
         
         pagadoCheckbox.addEventListener('change', toggleFecha);
-        toggleFecha();
+        toggleFecha(); // Ejecutar al cargar
     });
 </script>
 {% endblock %}

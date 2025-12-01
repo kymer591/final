@@ -57,6 +57,7 @@ def prestamo_editar(request, pk):
         form = PrestamoForm(request.POST, instance=prestamo)
         if form.is_valid():
             prestamo = form.save()
+            # Regenerar la tabla de amortización
             prestamo.generar_amortizacion()
             messages.success(
                 request, 
@@ -81,10 +82,12 @@ def prestamo_detalle(request, pk):
     prestamo = get_object_or_404(Prestamo, pk=pk)
     amortizaciones = prestamo.amortizaciones.all()
     
+    # Calcular totales
     total_cuotas = sum(a.cuota for a in amortizaciones)
     total_capital = sum(a.capital for a in amortizaciones)
     total_interes = sum(a.interes for a in amortizaciones)
     
+    # Calcular estado de pagos
     cuotas_pagadas = amortizaciones.filter(pagado=True).count()
     cuotas_pendientes = amortizaciones.filter(pagado=False).count()
     
@@ -118,6 +121,15 @@ def amortizacion_actualizar(request, pk):
     """Actualiza el estado de una cuota de amortización"""
     amortizacion = get_object_or_404(Amortizacion, pk=pk)
     
+    # Verificar si hay cuotas anteriores sin pagar
+    cuota_anterior_pendiente = None
+    if amortizacion.numero_cuota > 1:
+        cuota_anterior_pendiente = Amortizacion.objects.filter(
+            prestamo=amortizacion.prestamo,
+            numero_cuota__lt=amortizacion.numero_cuota,
+            pagado=False
+        ).first()
+    
     if request.method == 'POST':
         form = AmortizacionForm(request.POST, instance=amortizacion)
         if form.is_valid():
@@ -135,6 +147,7 @@ def amortizacion_actualizar(request, pk):
     context = {
         'form': form,
         'amortizacion': amortizacion,
-        'prestamo': amortizacion.prestamo
+        'prestamo': amortizacion.prestamo,
+        'cuota_anterior_pendiente': cuota_anterior_pendiente,
     }
     return render(request, 'creditos/amortizacion_form.html', context)

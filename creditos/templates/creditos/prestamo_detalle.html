@@ -3,6 +3,7 @@
 {% block title %}Detalle del Préstamo - {{ prestamo.nombre }}{% endblock %}
 
 {% block content %}
+<!-- Información del Préstamo -->
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
@@ -153,11 +154,19 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{% url 'amortizacion_actualizar' amortizacion.pk %}" 
-                                       class="btn btn-sm btn-outline-primary"
-                                       title="Actualizar estado">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
+                                    {% if amortizacion.puede_pagarse or amortizacion.pagado %}
+                                        <a href="{% url 'amortizacion_actualizar' amortizacion.pk %}" 
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Actualizar estado">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-outline-secondary" 
+                                                disabled 
+                                                title="Debe pagar las cuotas anteriores primero">
+                                            <i class="bi bi-lock"></i>
+                                        </button>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
