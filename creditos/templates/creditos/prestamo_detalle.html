@@ -1,0 +1,180 @@
+{% extends 'creditos/base.html' %}
+
+{% block title %}Detalle del Préstamo - {{ prestamo.nombre }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Información del Préstamo</h5>
+                <div>
+                    <a href="{% url 'prestamo_editar' prestamo.pk %}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a href="{% url 'prestamo_eliminar' prestamo.pk %}" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                    <a href="{% url 'prestamo_lista' %}" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Datos del Cliente</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <th width="40%">Nombre:</th>
+                                <td>{{ prestamo.nombre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cédula de Identidad:</th>
+                                <td>{{ prestamo.ci }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Datos del Préstamo</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <th width="40%">Monto:</th>
+                                <td><strong>Bs. {{ prestamo.monto|floatformat:2 }}</strong></td>
+                            </tr>
+                            <tr>
+                                <th>Tasa Anual:</th>
+                                <td>{{ prestamo.tasa_interes_anual }}%</td>
+                            </tr>
+                            <tr>
+                                <th>Tasa Mensual:</th>
+                                <td>{{ prestamo.tasa_mensual|floatformat:6 }}%</td>
+                            </tr>
+                            <tr>
+                                <th>Plazo:</th>
+                                <td>{{ prestamo.plazo }} meses</td>
+                            </tr>
+                            <tr>
+                                <th>Fecha Inicio:</th>
+                                <td>{{ prestamo.fecha_inicio|date:"d/m/Y" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cuota Mensual:</th>
+                                <td><strong class="text-success">Bs. {{ prestamo.cuota_mensual|floatformat:2 }}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen de Pagos -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Cuotas Pagadas</h6>
+                <h2 class="text-success">{{ cuotas_pagadas }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Cuotas Pendientes</h6>
+                <h2 class="text-warning">{{ cuotas_pendientes }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Total a Pagar</h6>
+                <h2 class="text-primary">Bs. {{ total_cuotas|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Total Intereses</h6>
+                <h2 class="text-info">Bs. {{ total_interes|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Amortización -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Tabla de Amortización</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Fecha Pago</th>
+                                <th class="text-end">Cuota</th>
+                                <th class="text-end">Capital</th>
+                                <th class="text-end">Interés</th>
+                                <th class="text-end">Saldo</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for amortizacion in amortizaciones %}
+                            <tr {% if amortizacion.pagado %}class="table-success"{% elif amortizacion.dias_mora > 0 %}class="table-danger"{% endif %}>
+                                <td>{{ amortizacion.numero_cuota }}</td>
+                                <td>{{ amortizacion.fecha_pago|date:"d/m/Y" }}</td>
+                                <td class="text-end">Bs. {{ amortizacion.cuota|floatformat:2 }}</td>
+                                <td class="text-end">Bs. {{ amortizacion.capital|floatformat:2 }}</td>
+                                <td class="text-end">Bs. {{ amortizacion.interes|floatformat:2 }}</td>
+                                <td class="text-end">Bs. {{ amortizacion.saldo|floatformat:2 }}</td>
+                                <td>
+                                    {% if amortizacion.pagado %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> {{ amortizacion.estado }}
+                                        </span>
+                                    {% elif amortizacion.dias_mora > 0 %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-triangle"></i> {{ amortizacion.estado }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-clock"></i> {{ amortizacion.estado }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'amortizacion_actualizar' amortizacion.pk %}" 
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="Actualizar estado">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-secondary">
+                            <tr>
+                                <th colspan="2" class="text-end">TOTALES:</th>
+                                <th class="text-end">Bs. {{ total_cuotas|floatformat:2 }}</th>
+                                <th class="text-end">Bs. {{ total_capital|floatformat:2 }}</th>
+                                <th class="text-end">Bs. {{ total_interes|floatformat:2 }}</th>
+                                <th colspan="3"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

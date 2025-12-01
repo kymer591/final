@@ -57,7 +57,6 @@ def prestamo_editar(request, pk):
         form = PrestamoForm(request.POST, instance=prestamo)
         if form.is_valid():
             prestamo = form.save()
-            # Regenerar la tabla de amortización
             prestamo.generar_amortizacion()
             messages.success(
                 request, 
@@ -82,12 +81,10 @@ def prestamo_detalle(request, pk):
     prestamo = get_object_or_404(Prestamo, pk=pk)
     amortizaciones = prestamo.amortizaciones.all()
     
-    # Calcular totales
     total_cuotas = sum(a.cuota for a in amortizaciones)
     total_capital = sum(a.capital for a in amortizaciones)
     total_interes = sum(a.interes for a in amortizaciones)
     
-    # Calcular estado de pagos
     cuotas_pagadas = amortizaciones.filter(pagado=True).count()
     cuotas_pendientes = amortizaciones.filter(pagado=False).count()
     

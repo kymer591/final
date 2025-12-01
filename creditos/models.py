@@ -61,8 +61,7 @@ class Prestamo(models.Model):
         return cuota.quantize(Decimal('0.01'))
     
     def generar_amortizacion(self):
-        """Genera la tabla de amortización completa"""
-        # Eliminar amortizaciones anteriores si existen
+        """tabla de amortización"""
         self.amortizaciones.all().delete()
         
         saldo = self.monto
@@ -70,27 +69,20 @@ class Prestamo(models.Model):
         fecha_pago = self.fecha_inicio
         
         for numero_cuota in range(1, self.plazo + 1):
-            # Calcular fecha de pago (agregar un mes)
             fecha_pago = fecha_pago + relativedelta(months=1)
-            
-            # Calcular interés del período
             interes = (saldo * self.tasa_mensual).quantize(Decimal('0.01'))
             
-            # Calcular capital (amortización)
             if numero_cuota == self.plazo:
-                # Última cuota: ajustar para que el saldo quede en 0
                 capital = saldo
                 cuota_ajustada = capital + interes
             else:
                 capital = (cuota - interes).quantize(Decimal('0.01'))
                 cuota_ajustada = cuota
             
-            # Calcular nuevo saldo
             nuevo_saldo = (saldo - capital).quantize(Decimal('0.01'))
             if nuevo_saldo < 0:
                 nuevo_saldo = Decimal('0.00')
             
-            # Crear registro de amortización
             Amortizacion.objects.create(
                 prestamo=self,
                 numero_cuota=numero_cuota,
@@ -101,15 +93,13 @@ class Prestamo(models.Model):
                 saldo=nuevo_saldo
             )
             
-            # Actualizar saldo para la siguiente iteración
             saldo = nuevo_saldo
     
     def save(self, *args, **kwargs):
         """Override del método save para generar amortización automáticamente"""
         is_new = self.pk is None
         super().save(*args, **kwargs)
-        
-        # Solo generar amortización si es un nuevo préstamo
+
         if is_new:
             self.generar_amortizacion()
 

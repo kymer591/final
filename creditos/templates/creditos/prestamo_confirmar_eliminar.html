@@ -1,0 +1,70 @@
+{% extends 'creditos/base.html' %}
+
+{% block title %}Confirmar Eliminación{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+                </div>
+
+                <h6 class="mb-3">¿Está seguro que desea eliminar este préstamo?</h6>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <table class="table table-sm mb-0">
+                            <tr>
+                                <th width="35%">Cliente:</th>
+                                <td>{{ prestamo.nombre }}</td>
+                            </tr>
+                            <tr>
+                                <th>CI:</th>
+                                <td>{{ prestamo.ci }}</td>
+                            </tr>
+                            <tr>
+                                <th>Monto:</th>
+                                <td>Bs. {{ prestamo.monto|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <th>Plazo:</th>
+                                <td>{{ prestamo.plazo }} meses</td>
+                            </tr>
+                            <tr>
+                                <th>Fecha Inicio:</th>
+                                <td>{{ prestamo.fecha_inicio|date:"d/m/Y" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <p class="text-danger small">
+                    <i class="bi bi-info-circle"></i>
+                    Se eliminarán también todas las cuotas de amortización asociadas 
+                    ({{ prestamo.amortizaciones.count }} cuotas).
+                </p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Sí, Eliminar Préstamo
+                        </button>
+                        <a href="{% url 'prestamo_detalle' prestamo.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> No, Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

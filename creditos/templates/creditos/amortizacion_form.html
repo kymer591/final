@@ -1,0 +1,137 @@
+{% extends 'creditos/base.html' %}
+
+{% block title %}Actualizar Cuota{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square"></i> Actualizar Estado de Cuota
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="bi bi-info-circle"></i> Información de la Cuota</h6>
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <th width="40%">Cliente:</th>
+                            <td>{{ prestamo.nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th>N° Cuota:</th>
+                            <td>{{ amortizacion.numero_cuota }} de {{ prestamo.plazo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Monto Cuota:</th>
+                            <td><strong>Bs. {{ amortizacion.cuota|floatformat:2 }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Fecha de Pago:</th>
+                            <td>{{ amortizacion.fecha_pago|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estado Actual:</th>
+                            <td>
+                                {% if amortizacion.pagado %}
+                                    <span class="badge bg-success">{{ amortizacion.estado }}</span>
+                                {% elif amortizacion.dias_mora > 0 %}
+                                    <span class="badge bg-danger">{{ amortizacion.estado }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning">{{ amortizacion.estado }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            {{ form.pagado }}
+                            <label class="form-check-label" for="{{ form.pagado.id_for_label }}">
+                                {{ form.pagado.label }}
+                            </label>
+                        </div>
+                        {% if form.pagado.errors %}
+                            <div class="text-danger small">
+                                {{ form.pagado.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Marque esta casilla si la cuota ha sido pagada
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.fecha_pago_real.id_for_label }}" class="form-label">
+                            {{ form.fecha_pago_real.label }}
+                        </label>
+                        {{ form.fecha_pago_real }}
+                        {% if form.fecha_pago_real.errors %}
+                            <div class="text-danger small">
+                                {{ form.fecha_pago_real.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Ingrese la fecha en que se realizó el pago (opcional si no está pagado)
+                        </small>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <hr>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar Cambios
+                        </button>
+                        <a href="{% url 'prestamo_detalle' prestamo.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="text-info"><i class="bi bi-lightbulb"></i> Información</h6>
+                <ul class="small mb-0">
+                    <li>Si marca la cuota como pagada, debe ingresar la fecha real de pago</li>
+                    <li>El sistema calculará automáticamente los días de mora si corresponde</li>
+                    <li>Si desmarca una cuota pagada, la fecha de pago se eliminará</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pagadoCheckbox = document.getElementById('{{ form.pagado.id_for_label }}');
+        const fechaInput = document.getElementById('{{ form.fecha_pago_real.id_for_label }}');
+        
+        function toggleFecha() {
+            if (pagadoCheckbox.checked) {
+                fechaInput.removeAttribute('disabled');
+                fechaInput.required = true;
+            } else {
+                fechaInput.setAttribute('disabled', 'disabled');
+                fechaInput.required = false;
+            }
+        }
+        
+        pagadoCheckbox.addEventListener('change', toggleFecha);
+        toggleFecha();
+    });
+</script>
+{% endblock %}
