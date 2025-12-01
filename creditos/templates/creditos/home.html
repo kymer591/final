@@ -1,0 +1,114 @@
+{% extends 'creditos/base.html' %}
+
+{% block title %}Inicio - Sistema de Crédito{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">
+            <i class="bi bi-bank2"></i> Sistema de Ahorro y Crédito
+        </h1>
+        <p class="lead text-muted">Gestión completa de préstamos y tablas de amortización</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Card: Ver Préstamos -->
+    <div class="col-md-4">
+        <div class="card h-100 text-center hover-card">
+            <div class="card-body d-flex flex-column">
+                <div class="mb-3">
+                    <i class="bi bi-list-ul display-1 text-primary"></i>
+                </div>
+                <h5 class="card-title">Ver Préstamos</h5>
+                <p class="card-text text-muted">
+                    Consulta todos los préstamos registrados en el sistema con sus tablas de amortización.
+                </p>
+                <a href="{% url 'prestamo_lista' %}" class="btn btn-primary mt-auto">
+                    <i class="bi bi-arrow-right-circle"></i> Ver Lista
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Nuevo Préstamo -->
+    <div class="col-md-4">
+        <div class="card h-100 text-center hover-card">
+            <div class="card-body d-flex flex-column">
+                <div class="mb-3">
+                    <i class="bi bi-plus-circle display-1 text-success"></i>
+                </div>
+                <h5 class="card-title">Nuevo Préstamo</h5>
+                <p class="card-text text-muted">
+                    Registra un nuevo préstamo. El sistema generará automáticamente la tabla de amortización.
+                </p>
+                <a href="{% url 'prestamo_crear' %}" class="btn btn-success mt-auto">
+                    <i class="bi bi-plus-lg"></i> Crear Préstamo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Administración -->
+    <div class="col-md-4">
+        <div class="card h-100 text-center hover-card">
+            <div class="card-body d-flex flex-column">
+                <div class="mb-3">
+                    <i class="bi bi-gear display-1 text-warning"></i>
+                </div>
+                <h5 class="card-title">Panel de Admin</h5>
+                <p class="card-text text-muted">
+                    Accede al panel de administración de Django para gestión avanzada del sistema.
+                </p>
+                <a href="/admin/" class="btn btn-warning mt-auto">
+                    <i class="bi bi-shield-lock"></i> Administración
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información del Sistema -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Características del Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary"><i class="bi bi-check-circle-fill"></i> Gestión de Préstamos</h6>
+                        <ul>
+                            <li>Registro completo de clientes y préstamos</li>
+                            <li>Validación automática de datos</li>
+                            <li>Cálculo de cuotas con sistema francés</li>
+                            <li>Tasa de interés anual capitalizable mensualmente</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary"><i class="bi bi-check-circle-fill"></i> Tabla de Amortización</h6>
+                        <ul>
+                            <li>Generación automática al crear préstamo</li>
+                            <li>Desglose de capital e interés por cuota</li>
+                            <li>Control de pagos realizados</li>
+                            <li>Cálculo automático de días de mora</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
